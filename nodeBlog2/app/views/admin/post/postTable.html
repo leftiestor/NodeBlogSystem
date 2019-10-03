@@ -1,0 +1,268 @@
+
+    <h2>文章列表</h2><hr/>
+    <div class="searchSortDiv  margin-b-20">
+        <form class="form-inline align-items-center" onsubmit="return false">
+            <div class="form-group col-auto">
+                <label for="search-title">标题：</label>
+                <input type="text" name="searchTitle" class="form-control form-control-sm" id="searchTitle" value="" />
+            </div>
+            <div class="form-group col-auto">
+                <label for="search-content">内容：</label>
+                <input type="text" name="searchContent" class="form-control form-control-sm"  id="searchContent" value="" />
+            </div>
+            <div class="form-group col-auto">
+                <button type="button" class="btn btn-primary btn-sm" id="searchBtn" onclick="search()"><i class="fa fa-search"></i></button>
+            </div>
+        </form>
+
+        <div class="searchDiv">
+            按&nbsp;&nbsp;&nbsp;&nbsp;
+            <button class="btn btn-outline-primary btn-sm margin-r-10" data-order="desc" data-name="title" id="sort-title">
+                标题&nbsp;<i class="fa fa-arrow-down"></i>
+            </button>
+            <button class="btn btn-outline-primary btn-sm margin-r-10 active" data-order="desc" data-name="created" id="sort-created">
+                创建时间&nbsp;<i class="fa fa-arrow-down"></i>
+            </button>
+            <button class="btn btn-outline-primary btn-sm margin-r-10" data-order="desc" data-name="meta.clicks" id="sort-likes">
+                阅读量&nbsp;<i class="fa fa-arrow-down"></i>
+            </button>
+            排序
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover text-center">
+            <thead class="">
+            <tr>
+                <th>序号</th>
+                <th>标题</th>
+                <th>分类</th>
+                <th>创建时间</th>
+
+                <th>更新时间</th>
+                <th>阅读量</th>
+                <th>评论</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="postList" data-userid={{userId}}>
+            <!-- 帖子列表 -->
+            </tbody>
+        </table>
+        <!-- 分页 -->
+        <nav aria-label="Page navigation" class="margin-t-20">
+            <ul class="pagination justify-content-end">
+                <!-- 分页 内容 -->
+            </ul>
+        </nav>
+    </div>
+
+
+<script>
+
+    let pageIndex = 1;
+    let pageSize = 10;
+    let pageNum = 1;  //总页数
+    let sortWay = "created";  //时间排序
+    let sortType = "desc";  //倒序
+	let userId = $("#postList").attr("data-userid");
+
+
+    $(function(){
+        init();  //初始化渲染
+
+        //排序 监听事件
+        $(".searchDiv button").click(function(){
+            //样式
+            if($(this).hasClass("active")){  //之前已被选中，则交换排序方式
+                if($(this).attr("data-order") === "desc"){
+                    $(this).attr("data-order","asc");
+                    $(this).children("i").removeClass("fa-arrow-down").addClass("fa-arrow-up");
+                }else{
+                    $(this).attr("data-order","desc");
+                    $(this).children("i").removeClass("fa-arrow-up").addClass("fa-arrow-down");
+                }
+            }else{  //没有被选中，就选中它
+                $(".searchDiv button").each(function(){
+                    $(this).removeClass("active");  //清除其他
+                });
+                $(this).addClass("active");
+            }
+            //赋值
+            sortType = $(this).attr("data-order");
+            sortWay = $(this).attr('data-name');
+            //请求接口
+            $.ajax({
+                url: "/"+userId+"/admin/sort?pageIndex=" + pageIndex+ "&sortWay=" + sortWay + "&sortType="+ sortType,
+                type: "get",
+                data: {},
+                success: (result) => {
+                    renderPage(result);
+                },
+                error: (err) => {
+                    console.log(err);
+                }
+            });
+
+        });
+
+
+    });
+
+    function init(){
+    	userId = $("#postList").attr("data-userid");
+        $.ajax({
+            url: "/"+userId+"/admin/getPostList?pageIndex="+pageIndex+"&pageSize="+pageSize+ "&sortWay=" + sortWay + "&sortType="+ sortType,
+            type: "get",
+            data: {},
+            success: (result) => {
+                renderPage(result);
+            },
+            error: (err) => {
+                console.log(err);
+            }
+        });
+    }
+    //渲染数据
+    function renderPage(result){
+        let posts = result.posts,
+            timeList = result.timeList;
+        let str = "";
+        if(posts.length > 0) {
+            posts.forEach((item, index) => {
+                str += `<tr>
+                            <td>${index + 1}</td>
+                            <td title="${item.title}">${item.title}</td>
+                            <td title="${item.category.name}">${item.category.name}</td>
+                            <td>${timeList[0][index]}</td>
+
+                            <td>${timeList[1][index]}</td>
+                            <td>${item.meta.clicks}</td>
+                            <td>${item.comments.length}</td>
+                            <td>${item.published ? "发布" : "未发布"}</td>
+                            <td>
+                                <a href="/${userId}/admin/look?id=${item.slug}" target="_blank">
+                                <button type="button" title="查看" class="btn btn-sm btn-outline-success line-height-1" id="btnLook" >
+                                <i class="fa fa-eye"></i></button></a>
+                                <a href="/${userId}/admin/edit?id=${item.slug}">
+                                <button type="button" title="编辑" class="btn btn-sm btn-outline-primary line-height-1"  id="btnEdit" >
+                                <i class="fa fa-pencil"></i></button></a>
+                                <a href="javascript:;"  onclick="deleteOne('${item._id.toString()}','${item.title}')" >
+                                <button type="button" title="删除到回收站" class="btn btn-sm btn-outline-danger line-height-1"  id="btnDelete" >
+                                <i class="fa fa-recycle"></i></button></a>
+                            </td>
+                        </tr>`;
+            });
+            $("#postList").html(str);
+            $("#postList tr td").css({   //超出省略
+                "maxWidth": "270px",
+                "overflow": "hidden",
+                "textOverflow": "ellipsis",
+                "whiteSpace": "nowrap"
+            });
+
+            pageNum = result.pageNum;  //赋值总页数
+            pageIndex = result.pageIndex;
+            //分页
+            let prevDisable = "", nextDisable = "";
+            if (pageIndex === 1) {
+                prevDisable = "disabled";
+            }
+            if (pageIndex === pageNum) {
+                nextDisable = "disabled";
+            }
+
+            let str2 = "";
+            for (let i = 1; i <= pageNum; i++) {
+                if (i === pageIndex) {
+                    str2 += `<li class="page-item active"><a class="page-link" href="javascript:;">${i}<span
+                                class="sr-only">(当前页)</span></a></li>`;
+                } else {
+                    str2 += `<li class="page-item"><a class="page-link" href="javascript:;" onclick="goToPage(${i})">${i}</a></li>`;
+                }
+            }
+            let pageStr = ` <li class="page-item ${prevDisable}">
+                                <a class="page-link" id="prevPage" href="javascript:;" onclick="prevPage()" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+                            ${str2}
+                             <li class="page-item ${nextDisable}">
+                                <a class="page-link" id="nextPage" href="javascript:;" onclick="nextPage()" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                            <input type="hidden" id="dataTotal" value="${pageIndex}" data-total="${pageNum}"/>`;
+            $(".pagination").html(pageStr);
+        }else{
+            $("#postList").html("<tr><td colspan='9' class='searchWarning'>没有查询到数据！</td></tr>");
+            $(".pagination").html("");
+        }
+    }
+
+    //上一页
+    function prevPage(){
+        if((--pageIndex) <= 0){
+            pageIndex = 1;
+        }
+        init();
+    }
+    //下一页
+    function nextPage(){
+        if ((++pageIndex) > pageNum) {
+            pageIndex = pageNum;
+        }
+        init();
+    }
+    //跳转页
+    function goToPage(pageNo){
+        pageIndex = parseInt(pageNo);
+        init();
+    }
+
+    //搜索内容
+    function search(){
+        let title = $("#searchTitle").val() || "";
+        let content = $("#searchContent").val() || "";
+        console.log(title,content);
+        $.ajax({
+            url: "/"+userId+"/admin/search",
+            type: "post",
+            data: {
+                "title":title,
+                "content":content,
+            },
+            success: (result) => {
+                renderPage(result);
+            },
+            error: (err) => {
+                console.log(err);
+            }
+        });
+    }
+    //删除一个
+    function deleteOne(id,title){
+    	let result = confirm("确认将此条信息加入到回收站？\n' "+title+" '");
+        if(result == true){
+            $.ajax({
+                url: "/"+userId+"/admin/delete?id="+id,
+                type: "get",
+                data: {},
+                success: (result) => {
+                    alert(result.message);
+                    if(result.code === "0"){
+                        init();  //刷新页面内容
+                    }
+                },
+                error: (err) => {
+                    console.log(err);
+                    alert(err.toString());
+                }
+            });
+        }
+    }
+
+</script>

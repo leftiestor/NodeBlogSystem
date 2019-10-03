@@ -1,0 +1,168 @@
+{% extends '../layout.html' %}
+
+{% block content %}
+
+<div class="container">
+    <header class="blog-header py-3">
+        <div class="row flex-nowrap justify-content-between align-items-center">
+        	{% if isSelf == false %}
+            <div class="col-3 pt-1" id="cared_div" data-iscared="{{isCared}}">
+            	{% if isCared %}
+                 <button class="btn btn-outline-info" onclick="caredOnOff('{{post.author.name}}')"><a class="text-muted" href="javascript:;">已关注</a></button>
+                {% else %}
+                 <button class="btn btn-outline-danger" onclick="caredOnOff('{{post.author.name}}')"><a class="text-muted" href="javascript:;">关注</a></button>
+                {% endif %}
+            </div>
+            {% endif %}
+             
+            <div class="col-6 text-center">
+                <a class="blog-header-logo text-dark" href="#">{{post.author.name}}</a>
+            </div>
+            <div class="col-3 d-flex justify-content-end align-items-center">
+               
+                <a class="btn btn-sm btn-outline-secondary" href="/sysHome/loginOut">退出登录</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-scroller py-1 mb-2">
+        <nav class="nav d-flex justify-content-start">
+            <a class="p-2 text-muted margin-r-20 hov-bg-li-purple" href="/sysHome">系统主页</a>
+            <a class="p-2 text-muted margin-r-20 hov-bg-li-purple" href="/{{userId}}/posts">我的文章</a>
+            <a class="p-2 text-muted margin-r-20 hov-bg-li-purple" href="/{{userId}}/category">我的分类</a>
+            <a class="p-2 text-muted margin-r-20 hov-bg-li-purple" href="/{{userId}}/myadmin" target="_blank">后台管理</a>
+            <a class="p-2 text-muted margin-r-20 hov-bg-li-purple" href="/{{userId}}/userCenter">个人中心</a>
+
+        </nav>
+    </div>
+
+</div>
+
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-8 blog-main">
+            <h3 class="text-center">
+                {{post.title}}
+            </h3>
+            <!--<h4 class="blog-post-title text-center font-20 font-color-333">{{post.title}}</h4>-->
+            <p class="pb-4 blog-post-meta border-bottom text-center font-12 font-color-666">
+                <i class="fa fa-calendar "></i>
+                &nbsp;{{moment(post.created).format("YYYY-MM-DD HH:mm")}}&nbsp;&nbsp;
+                <i class="fa fa-user "></i>
+                {{post.author.name}}&nbsp;&nbsp;
+                <i class="fa fa-eye "></i>
+                {% if post.meta.clicks %}
+                阅读({{post.meta.clicks}})&nbsp;&nbsp;
+                {% else %}
+                阅读(0)&nbsp;&nbsp;
+                {% endif %}
+                <i class="fa fa-comment "></i>
+                评论({{comments.length}})&nbsp;&nbsp;
+            </p>
+            <div class="post-container">
+                <!-- 帖子内容 -->
+                {% if post.content === "空" %}
+                <div class="post-content" id="postContent"></div>
+                {% else %}
+                <div class="post-content" id="postContent">{{post.content|raw}}</div>
+                 {% endif %}
+            </div><!-- /.blog-post -->
+            
+			<div class="post-tag-div">
+				<!--帖子标签-->
+				{% if post.tag.length > 0 %}
+				<label>标签：</label>
+				<ul class="post-tag-ul" id="postTag">
+					{% for t in post.tag %}
+					<li>{{t}}</li>
+					{% endfor %}
+				</ul>
+				{% endif %}
+			</div>
+			 <!-- 点赞和踩 -->
+			<div class="">
+				
+			</div>
+            <!-- 添加评论 -->
+            <div class="">
+            	 
+                <form class="" id="myCommentForm" data-username="{{userName}}">
+                    <hr/><h5>发表评论</h5>
+                    <div class="form-group row">
+                        <label for="username" class="col-form-label margin-l-15" >昵称：</label>
+                        <input class="form-control col-6" type="text" name="userName" id="userName" readonly
+                               value="">
+                    </div>
+                    <div class="form-group row">
+                        <label for="content" class="col-form-label  margin-l-15">内容：</label>
+                        <textarea class="form-control col-10 font-14" name="content" id="content" cols="40"
+                                  rows="7" maxlength="400" required ></textarea>
+                    </div>
+                    <!-- postId -->
+                    <input type="hidden" name="postId" value="{{post._id.toString()}}"/>
+                    <!-- 登录用户的id-->
+                    <!--<input type="hidden" name="userId" value=""/>-->
+
+                    <button type="button" id="commentSubmit" class="btn btn-primary">发布</button>
+                </form>
+                
+                <!--评论列表-->
+                <div class="post-comment">
+                    <hr/><h5>其他评论</h5>
+                    {% if comments.length > 0 %}
+                    {% for comment in comments %}
+                    <div class="oneComment_div margin-b-10">
+                        <h6 class="" id=""><a href="javascript:;">#{{loop.revindex}}#</a>&nbsp;&nbsp;{{comment.userName}}&nbsp;&nbsp;</h6>
+                        <p class="comment_p1">{{comment.content}}</p>
+                        <p class="comment_p2">{{moment(comment.created).format("YYYY-MM-DD HH:mm")}}</p>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="alert alert-info">此文章还没有评论</p>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div><!-- /.blog-main -->
+
+
+        <aside class="col-md-4 blog-sidebar">
+            <div class="p-4 mb-3 bg-light rounded">
+                <h4 class="font-italic">About</h4>
+                <div class="mb-0">
+                	<p>博龄：<span id="age">1年</span></p>
+                	<p>
+                		关注：<span id="caredNum"></span>
+                		&nbsp;&nbsp;&nbsp;&nbsp;粉丝：<span id="fanNum"></span>
+                	</p>
+                </div>
+            </div>
+
+            
+            <div class="p-4">
+                <h4 class="font-italic">帖子分类</h4>
+                <ol class="list-unstyled group-ul" id="categories" data-userid="{{userId}}">
+                    <!--<li><a href="#"></a></li>-->
+                    
+                </ol>
+            </div>
+            <div class="p-4">
+                <h4 class="font-italic">Archives</h4>
+                <ol class="list-unstyled mb-0" id="archive">
+                    <!--<li><a href="#">March 2014</a></li>-->
+
+                </ol>
+            </div>
+
+            
+        </aside><!-- /.blog-sidebar -->
+
+    </div><!-- /.row -->
+
+</main><!-- /.container -->
+<!-- footer -->
+{% include "foot.html" %}
+
+<script type="text/javascript" src="/js/postsManageDis.js"></script>
+
+{% endblock %}

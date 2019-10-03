@@ -1,0 +1,225 @@
+{% extends '../layout.html' %}
+
+{% block content %}
+
+<div class="container">
+    <header class="blog-header py-3">
+        <div class="row flex-nowrap justify-content-between align-items-center">
+            <div class="col-3 pt-1">
+                <a class="text-muted" href="#"></a>
+            </div>
+            <div class="col-6 text-center">
+                <a class="blog-header-logo text-dark" href="#">- {{userName}} -</a>
+            </div>
+            <div class="col-3 d-flex justify-content-end align-items-center">
+              
+                <a class="btn btn-sm btn-outline-secondary" href="/sysHome/loginOut" >退出登录</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-scroller py-1 mb-2">
+        <nav class="nav d-flex justify-content-start">
+            <a class="p-2 text-muted margin-r-20 hov-bg-li-purple" href="/sysHome">系统主页</a>
+            <a class="p-2 text-muted margin-r-20 hov-bg-li-purple" href="/{{userId}}/posts">我的文章</a>
+            <a class="p-2 text-muted margin-r-20 hov-bg-li-purple" href="/{{userId}}/category">我的分类</a>
+            <a class="p-2 text-muted margin-r-20 hov-bg-li-purple" href="/{{userId}}/myadmin" target="_blank">后台管理</a>
+            <a class="p-2 text-muted margin-r-20 hov-bg-li-purple" href="/{{userId}}/userCenter">个人中心</a>
+            
+
+        </nav>
+    </div>
+
+</div>
+
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-8 blog-main">
+            <h3 class="pb-4 mb-4 border-bottom">
+                {{title}}
+            </h3>
+            {% if posts.length > 0 %}
+	            {% for post in posts %}
+	            <div class="blog-post bg-lightgold">
+	
+	                <h4 class="blog-post-title font-20 font-color-333">
+	                	<a href="/{{userId}}/postOne/dis/{{post.slug}}">{{post.title}}</a></h4>
+	                <div class="post-content">{{truncate(post.content, 120)}}
+	                    &nbsp;&nbsp;<a class="font-12" href="/{{userId}}/postOne/dis/{{post.slug}}" target="_blank">阅读全文</a>
+	                </div>
+	                <p class="blog-post-meta font-12 font-color-666 margin-b-0">
+	                    {% if post.created %}
+	                    posted
+	                    {% else %}
+	                    notPost
+	                    {% endif %}&nbsp;
+	                    @&nbsp;{{moment(post.created).format("YYYY-MM-DD HH:mm")}}&nbsp;&nbsp;
+	                    {{post.author.name}}&nbsp;&nbsp;
+	                    {% if post.meta.clicks %}
+	                    阅读({{post.meta.clicks}})&nbsp;&nbsp;
+	                    {% else %}
+	                    阅读(0)&nbsp;&nbsp;
+	                    {% endif %}
+	                    评论({{post.comments.length}})&nbsp;&nbsp;
+	                    <a href="#">编辑</a>
+	                </p>
+	            </div><!-- /.blog-post -->
+	            {% endfor %}
+	
+	            <nav aria-label="Page navigation" class="margin-t-20">
+	                <ul class="pagination justify-content-center">
+	                    {% if pageIndex === 1 %}
+	                    <li class="page-item disabled">
+	                        <a class="page-link" id="prevPage" href="javascript:;" aria-label="Previous">
+	                            <span aria-hidden="true">&laquo;</span>
+	                            <span class="sr-only">Previous</span>
+	                        </a>
+	                    </li>
+	                    {% else %}
+	                    <li class="page-item">
+	                        <a class="page-link" id="prevPage" href="/{{userId}}/prevpage?pageIndex={{pageIndex}}"
+	                           aria-label="Previous">
+	                            <span aria-hidden="true">&laquo;</span>
+	                            <span class="sr-only">Previous</span>
+	                        </a>
+	                    </li>
+	                    {% endif %}
+	                    {% for ind in pageArr %}
+	                        {% if ind == pageIndex %}
+	                        <li class="page-item active"><a class="page-link" href="javascript:;">{{ ind }}<span
+	                                class="sr-only">(当前页)</span></a></li>
+	                        {% else %}
+	                        <li class="page-item"><a class="page-link" href="/{{userId}}/pageto?pageIndex={{ind}}">{{ ind }}</a></li>
+	                        {% endif%}
+	                    {% endfor %}
+	
+	                    {% if pageIndex === pageNum %}
+	                    <li class="page-item disabled">
+	                        <a class="page-link" id="nextPage" href="" aria-label="Next">
+	                            <span aria-hidden="true">&raquo;</span>
+	                            <span class="sr-only">Next</span>
+	                        </a>
+	                    </li>
+	                    {% else %}
+	                    <li class="page-item">
+	                        <a class="page-link" id="nextPage" href="/{{userId}}/nextpage?pageIndex={{pageIndex}}" aria-label="Next">
+	                            <span aria-hidden="true">&raquo;</span>
+	                            <span class="sr-only">Next</span>
+	                        </a>
+	                    </li>
+	                    {% endif %}
+	                    <input type="hidden" id="dataTotal" value="{{pageIndex}}" data-total="{{pageNum}}"/>
+	                </ul>
+	            </nav>
+				{% else %}
+				<p class="alert alert-danger">您还没有发布文章，<a href="/{{userId}}/newPost">点我去发布</a></p>
+				{% endif %}
+        </div><!-- /.blog-main -->
+
+        <aside class="col-md-4 blog-sidebar">
+            <div class="p-4 mb-3 bg-light rounded">
+                <h4 class="font-italic">About</h4>
+                <div class="mb-0">
+                	<p>博龄：<span id="age">1年</span></p>
+                	<p>
+                		关注：<span id="caredNum"></span>
+                		&nbsp;&nbsp;&nbsp;&nbsp;粉丝：<span id="fanNum"></span>
+                	</p>
+                </div>
+            </div>
+
+            <div class="p-4">
+                <h4 class="font-italic">文章分类</h4>
+                <ul class="list-unstyled group-ul" id="categories" data-userid="{{userId}}">
+                    <!--<li><a href="#">GitHub</a></li>-->
+                   
+                </ul>
+            </div>
+            
+            <div class="p-4">
+                <h4 class="font-italic">帖子档案</h4>
+                <ol class="list-unstyled mb-0" id="archive">
+                    <!--<li><a href="#">March 2014</a></li>-->
+                    
+
+                </ol>
+            </div>
+        </aside><!-- /.blog-sidebar -->
+
+    </div><!-- /.row -->
+
+</main><!-- /.container -->
+<!-- footer -->
+{% include "foot.html" %}
+<!--<script type="text/javascript" src="/js/postsInit.js"></script>-->
+<script>
+	window.onload = function () {
+
+    let pageIndex = parseInt($("#dataTotal").val());  //当前页码
+    let pagenum = parseInt($("#dataTotal").prop("data-total"));  //总共页数
+    let userId = $("#categories").attr("data-userid");
+    
+    //获取关于信息 -博龄
+    $.ajax({
+        url: "/"+userId+"/userInfo/statistic/registerInfo",
+        type: "get",
+        data: {},
+        success: (result) => {
+			let timeStr = "";
+			if(result.ageYear == 0){
+				if(result.ageMonth == 0){
+					timeStr = result.ageDay+" 天";
+				}else{
+					timeStr =result.ageMonth+" 月 " + result.ageDay+" 天";
+				}
+			}else if(result.ageYear){
+				timeStr = result.ageYear + " 年 ";
+				if(result.ageMonth == 0){
+					timeStr += result.ageDay+" 天";
+				}else{
+					timeStr +=result.ageMonth+" 月 " + result.ageDay+" 天";
+				}
+			}
+			$("#age").html(timeStr);
+        },
+        error: (err) => {
+            console.log(err);
+        }
+    });
+	//获取关注和粉丝数量
+	$.ajax({
+        url: "/"+userId+"/userInfo/statistic/caredInfo",
+        type: "get",
+        data: {},
+        success: (result) => {
+			if(result.code == "0"){
+				$("#fanNum").html(result.fanNum);
+				$("#caredNum").html(result.caredNum);
+			}
+        },
+        error: (err) => {
+            console.log(err);
+        }
+    });
+    //获取侧边栏信息
+    $.ajax({
+        url: "/"+userId+"/getAsideInfo",
+        type: "get",
+        data: {},
+        success: (result) => {
+            let str = "";
+            result.forEach((item, index) => {
+                str += `<li><a href="/${userId}/posts/category/${item._id.toString()}">${item.name}</a></li>`;
+            	
+            });
+            $("#categories").html(str);
+        },
+        error: (err) => {
+            console.log(err);
+        }
+    });
+
+}
+
+</script>
+{% endblock %}

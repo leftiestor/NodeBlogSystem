@@ -1,0 +1,64 @@
+
+<h2>粉丝管理</h2><hr/>
+<input type="hidden" id="userId" value="{{userId}}" />
+<h5 class="font-color-666 margin-b-20">【{{userName}}】 的粉丝团：</h5>
+{% if user.fans.length > 0 %}
+	{% for fan in user.fans %}
+	<input type="hidden" name="userCared" value="{{fan.toString()}}" />
+	{% endfor %}
+	<div class="fan_contain">
+		<ul class="fanInfo_ul" id="fanId_ul">
+			<!--粉丝列表-->
+		</ul>
+	</div>
+{% else %}
+	<p class="alert alert-danger text-center"><a href="/sysHome">空空如也，继续努力，是金子总会发光</a></p>
+{% endif %}
+
+<script>
+	
+	let userId = $("#userId").val();
+	let strArr = "";
+	$(function() {
+		userId = $("#userId").val();
+		initing();
+	});
+	//初始化
+	function initing(){
+		strArr = "";
+		let userid = userId;
+		$("input[name='userCared']").each(function (){
+			let vals = $(this).val();
+			console.log("vals:",vals);
+			$.ajax({
+				url:"/"+userid+"/userInfo/fanManage/getFanInfo",
+				type:"post",
+				dataType:"json",
+				data:{
+					"id": userid,
+					"fanUserId": vals
+				},
+				success:function(result){
+					console.log(result);
+					if(result.code === "0"){
+						let user = result.user;
+						let userImgSrc = user.img !=="" ? "/userImg/"+user.img : "/img/BLOG.png";
+						strArr += `<li><img src="${userImgSrc}" />
+									<p><a href="/sysHome/blogger?name=${user.name}&id=${user._id.toString()}">${user.name}</a></p>
+									<div class="fan_fanCared_contain">
+										<p><a href="">TA关注的人：<span>${user.fans.length}</span></a></p>
+										<p><a href="">关注TA的人：<span>${user.cared.length}</span></a></p>
+									</div></li>`;
+						$("#fanId_ul").html(strArr);
+					}else{
+						alert(result.message);
+					}
+				},error:function(err){
+					alert(err.toString());
+				}
+			})
+			
+		});
+	}
+	
+</script>

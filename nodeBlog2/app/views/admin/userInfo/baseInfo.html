@@ -1,0 +1,246 @@
+
+
+<h2>基本信息</h2><hr/>
+<input type="hidden" id="userId" value="{{userId}}" />
+<div class="baseInfo_contain">
+	<!--left-->
+	<div class="baseInfo_left">
+		
+		<!--头像-->
+		<figure class="figure myfigure">
+			{% if user.img %}
+		   	<img src="/userImg/{{user.img}}" width="250" height="250" class="img-thumbnail userHeader" alt="{{userName}} 的头像">
+		   	{% else %}
+		   	<img src="/img/BLOG.png" width="200" height="250" class="img-thumbnail userHeader" alt="默认头像">
+		   	{% endif %}
+		   	
+		  	<!--头像文件上传模块-->
+			 {% include "imgUp.html" %}
+		  	
+		</figure>
+	</div>
+	
+	
+	<!--right-->
+	<div class="baseInfo_right">
+		<!--用户名-->
+		
+		<div class="userName_cont">
+			昵称：
+			<span id="name_span">{{user.name}}</span>
+			<a href="javascript:;" id="userName_a" data-toggle="collapse" data-target="#collapseUserName" aria-expanded="false" ><i class="fa fa-pencil"></i></a>
+			<div class="collapse" id="collapseUserName">
+				<small>修改为：</small><input type="text" name="userName" class="form-control" placeholder="2~12位字符，只包含字母、汉字…" maxlength="12" />
+				<button class="btn btn-sm btn-outline-info" id="" onclick="userInfoEdit(1, this)">确定</button>
+			</div>
+		</div>
+		
+		<div class="userEmail_cont">
+			邮箱：
+			<span id="email_span">{{user.email}}</span>
+			<a href="javascript:;" id="UserEmail_a" data-toggle="collapse" data-target="#collapseUserEmail" aria-expanded="false" ><i class="fa fa-pencil"></i></a>
+			<div class="collapse" id="collapseUserEmail">
+				<small>修改为：</small><input type="email" name="userEmail" class="form-control" placeholder="请输入邮箱…" maxlength="50"/>
+				<button class="btn btn-sm btn-outline-info" id=""  onclick="userInfoEdit(2, this)">确定</button>
+			</div>
+		</div>
+		<div class="userPhone_cont">
+			电话：
+			<span id="phone_span">{{user.phone}}</span>
+			<a href="javascript:;" id="userPhone_a" data-toggle="collapse" data-target="#collapseUserPhone" aria-expanded="false" ><i class="fa fa-pencil"></i></a>
+			<div class="collapse" id="collapseUserPhone">
+				<small>修改为：</small><input type="tel" name="userPhone" class="form-control"  placeholder="请输入电话…" maxlength="11"/>
+				<button class="btn btn-sm btn-outline-info" id=""  onclick="userInfoEdit(3, this)">确定</button>
+			</div>
+		</div>
+		
+		<div class="userPhone_cont">
+			密码：
+			<span id="password_span">*******(已加密)</span>
+			<a href="javascript:;" id="userPassword_a" data-toggle="collapse" data-target="#collapseUserPassword" aria-expanded="false" ><i class="fa fa-pencil"></i></a>
+			<div class="collapse" id="collapseUserPassword">
+				<div>
+					<small>原密码：</small><span id="passWarning" class="font-14"></span>
+					<input type="password" name="userOldPassword" class="form-control"  placeholder="输入原密码…" maxlength="30" />
+					
+				</div>
+				<small>修改为：</small><input type="password" name="userPassword" class="form-control"  placeholder="6~30位字符…" maxlength="30" />
+				<small>确认密码：</small><input type="password" name="userPasswordConfirm" class="form-control"  placeholder="确认密码…" maxlength="30" />
+				<button class="btn btn-sm btn-outline-info" id=""  onclick="userInfoEdit(4, this)">确定</button>
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+
+<script type="text/javascript" charset="utf-8" src="/js/imgUp.js"></script>
+<script>
+	let userid = $("#userId").val();
+	let lookOldPassword = false;
+	let oldPassword = "";
+	
+	
+	$(function(){
+		userid = $("#userId").val();
+		$.ajax({
+			url:"/"+userid+"/userInfo/changeInfo/getOldPassword",
+			type:"get",
+			dataType:"json",
+			data:{},
+			success:function(result){
+				console.log(result);
+				if(result.code === "0"){
+					oldPassword = result.oldPassword;
+				}else{
+					console.log(result.message);
+				}
+				
+			},error:function(err){
+				console.log(err);
+			}
+		})
+		
+		$("input[name='userOldPassword']").bind("input propertychange", function(){
+			let str = $(this).val().trim();
+			if(str != ""){
+				let strMD5 = $.md5(str);
+				if(oldPassword != ""){
+					if(strMD5 != oldPassword){
+						$("#passWarning").html("原密码输入错误").css({"color":"red","font-size":"16px"});
+						lookOldPassword = false;
+					}else{
+						lookOldPassword = true;
+						$("#passWarning").html("原密码输入正确").css({"color":"green","font-size":"16px"});
+					}
+				}
+			}
+		})
+		
+	});
+	
+	//编辑
+	function userInfoEdit(num, obj){
+		
+		//当前的输入框值
+		let vals = $(obj).prev().val().trim();
+		let firsPass = $("input[name='userPassword']").val().trim(); //第一次密码
+		let secondPass = $("input[name='userPasswordConfirm']").val().trim();;     //第二次密码
+		console.log(firsPass,vals);
+		if(vals.length > 0){
+			if(num === 1){
+				//昵称验证
+				let reg = /^[a-zA-Z\u4e00-\u9fa5]{2,12}$/;
+				if(!reg.test(vals)){
+					alert("用户昵称为2~12位字符，只包含字母、汉字！");
+				}else{
+					submitChange(num, vals);
+				}
+			}
+			if(num === 2){
+				//邮箱验证
+				if(0 == emailTest(vals)){
+					submitChange(num, vals);
+				}else if(2 == emailTest(vals)){
+					alert("邮箱格式不符！");
+				}
+			}
+			if(num === 3){
+				//手机验证
+				let phoneReg = /^1[34578]\d{9}$/;
+				if(!phoneReg.test(vals)){
+					alert("手机格式不符！");
+				}else{
+					submitChange(num, vals);
+				}
+			}
+			if(num === 4){
+				//密码验证
+				if(lookOldPassword){  //原密码校验成功后
+					if(firsPass == ""){
+						alert("请输入新密码！");
+						return;
+					}
+					if(secondPass == ""){
+						alert("请输入确认密码！");
+						return;
+					}
+					if(firsPass != secondPass){
+						alert("两次密码输入不匹配！");
+						return;
+					}
+					submitChange(num, $.md5(vals));
+				}else{
+					alert("原密码输入错误！");
+				}
+				
+			}
+		}else{
+			alert("输入不能为空！");
+		}
+		
+	}
+	//提交修改信息
+	function submitChange(num, cont){
+		let userid = $("#userId").val();
+		$.ajax({
+			url:"/"+userid+"/userInfo/changeInfo",
+			type:"post",
+			dataType:"json",
+			data:{
+				"id": userid,
+				"changeNum": num,
+				"changeCont": cont
+			},
+			success:function(result){
+				console.log(result);
+				if(result.code === "0"){
+					if(num == 1){
+						$("#name_span").html(cont);
+						$("#nav_userName").html(cont);  //nav-top
+						$("#name_span").next().click();
+						$("input[name='userName']").val("");
+						
+					}
+					if(num == 2){
+						$("#email_span").html(cont);
+						$("#email_span").next().click();
+						$("input[name='userEmail']").val("");
+						
+					}
+					if(num == 3){
+						$("#phone_span").html(cont);
+						$("#phone_span").next().click();
+						$("input[name='userPhone']").val("");
+					}
+					if(num == 4){
+						$("#password_span").next().click();
+						$("#passWarning").html("")
+						$("input[name='userOldPassword']").val("");
+						$("input[name='userPassword']").val("");
+						$("input[name='userPasswordConfirm']").val("");
+						oldPassword = cont;  //重新更换全局变量
+					}
+				}else{
+					alert(result.message);
+				}
+				
+			},error:function(err){
+				alert(err.toString());
+			}
+		})
+	}
+	
+	//验证是否是邮箱格式
+	function emailTest(email) {
+		if(email == "") {
+			return 1;
+		}
+		if(!/^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/.test(email)) {
+			return 2;
+		}
+		return 0;
+	}
+
+	
+</script>

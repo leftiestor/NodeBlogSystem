@@ -1,0 +1,210 @@
+
+<h2>分类列表</h2><hr/>
+<div class="table-responsive">
+    <table class="table table-bordered table-hover text-center">
+        <thead class="">
+        <tr>
+            <th>序号</th>
+            <th>评论者</th>
+            <th>内容</th>
+            <th>评论文章</th>
+
+            <th>评论时间</th>
+            <th>支持-反对</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="commentList" data-userid="{{userId}}" data-username="{{userName}}">
+        <!-- 草稿列表 -->
+        </tbody>
+    </table>
+    <!-- 分页 -->
+    <nav aria-label="Page navigation" class="margin-t-20">
+        <ul class="pagination justify-content-end">
+            <!-- 分页 内容 -->
+        </ul>
+    </nav>
+</div>
+    
+
+<script>
+	
+	let pageIndex = 1;
+    let pageSize = 10;
+    let pageNum = 1;  //总页数
+    
+	let userId = $("#commentList").attr("data-userid");
+	let userName = $("#commentList").attr("data-username");
+	$(function(){
+		init();
+		
+	});
+	
+	//初始化函数
+	function init(){
+		userId = $("#commentList").attr("data-userid");
+		userName = $("#commentList").attr("data-username");
+		
+		
+        $.ajax({
+            url: "/"+userId+"/commentManage/getCommentList?pageIndex="+pageIndex+"&pageSize="+pageSize,
+            type: "get",
+            data: {},
+            success: (result) => {
+               
+                renderPage(result);
+
+            },
+            error: (err) => {
+                console.log(err);
+            }
+        });
+    }
+	//渲染数据
+    function renderPage(result){
+        let comments = result.comments,
+            timeList = result.timeList;
+        let str = "";
+        if(comments.length > 0) {
+        	let creator = userName;
+            comments.forEach((item, index) => {
+            	let bool = false;
+                str += `<tr>
+                            <td>${index + 1}</td>
+                            <td title="${item.userName}">${item.userName}</td>
+                            <td title="${item.content}">${item.content}</td>
+                            <td class="commentBelong">${item.belong.toString()}</td>
+
+                            <td>${timeList[index]}</td>
+                            <td>${item.meta.likes} - ${item.meta.dislikes}</td>
+                            
+                            <td>
+                               <a href="/${userId}/commentManage/look?postId=${item.belong.toString()}" target="_blank">
+                                	<button type="button" title="查看" class="btn btn-sm btn-outline-success line-height-1" id="btnLook" >
+                                		<i class="fa fa-eye"></i></button></a>
+                                		
+                            	<a href="javascript:;"  onclick="deleteOne('${item._id.toString()}')" >
+	                            	<button type="button" title="申请删除" class="btn btn-sm btn-outline-danger line-height-1"  id="btnDelete">
+	                            		<i class="fa fa-trash"></i></button></a>
+	                            
+                            </td>
+                        </tr>`;
+            });
+            $("#commentList").html(str);
+            $("#commentList tr .commentBelong").each(function(){
+            	let _this = $(this)[0];
+             	let postId = $(this)[0].innerHTML;
+             	$.ajax({
+				    url: "/"+userId+"/commentManage/getPostTitle",
+				    type: "post",
+				    data: {
+				    	"postId": postId
+				    },
+				    success: (result) => {
+				        if(result.code === "0"){
+				        	_this.innerHTML = result.postTitle;
+				        }else{
+				        	console.log(result.message);
+				        }
+				    },
+				    error: (err) => {
+				        console.log(err);
+				    }
+				});
+            })
+            
+            $("#commentList tr td").css({   //超出省略
+                "maxWidth": "270px",
+                "overflow": "hidden",
+                "textOverflow": "ellipsis",
+                "whiteSpace": "nowrap"
+            });
+
+            pageNum = result.pageNum;  //赋值总页数
+            pageIndex = result.pageIndex;
+            //分页
+            let prevDisable = "", nextDisable = "";
+            if (pageIndex === 1) {
+                prevDisable = "disabled";
+            }
+            if (pageIndex === pageNum) {
+                nextDisable = "disabled";
+            }
+
+            let str2 = "";
+            for (let i = 1; i <= pageNum; i++) {
+                if (i === pageIndex) {
+                    str2 += `<li class="page-item active"><a class="page-link" href="javascript:;">${i}<span
+                                class="sr-only">(当前页)</span></a></li>`;
+                } else {
+                    str2 += `<li class="page-item"><a class="page-link" href="javascript:;" onclick="goToPage(${i})">${i}</a></li>`;
+                }
+            }
+            let pageStr = ` <li class="page-item ${prevDisable}">
+                                <a class="page-link" id="prevPage" href="javascript:;" onclick="prevPage()" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+                            ${str2}
+                             <li class="page-item ${nextDisable}">
+                                <a class="page-link" id="nextPage" href="javascript:;" onclick="nextPage()" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                            <input type="hidden" id="dataTotal" value="${pageIndex}" data-total="${pageNum}"/>`;
+            $(".pagination").html(pageStr);
+            
+        }else{
+            $("#commentList").html("<tr><td colspan='6' class='searchWarning'>没有查询到数据！</td></tr>");
+            $(".pagination").html("");
+        }
+    }
+
+    //上一页
+    function prevPage(){
+        if((--pageIndex) <= 0){
+            pageIndex = 1;
+        }
+        init();
+    }
+    //下一页
+    function nextPage(){
+        if ((++pageIndex) > pageNum) {
+            pageIndex = pageNum;
+        }
+        init();
+    }
+    //跳转页
+    function goToPage(pageNo){
+        pageIndex = parseInt(pageNo);
+        init();
+    }
+
+	
+	//删除一个
+    function deleteOne(id){
+    	let result = confirm("提示：发起删除评论申请后，系统管理员将会尽快审核，审核通过后自动删除。\n您确定要发起？");
+        if(result == true){
+            $.ajax({
+                url: "/"+userId+"/commentManage/delete",
+                type: "post",
+                data: {
+                	"commentId" : id
+                },
+                success: (result) => {
+                	alert(result.message) 
+                    if(result.code === "0"){
+                    	//刷新页面内容
+                    }
+                },
+                error: (err) => {
+                    console.log(err);
+                    alert(err.toString());
+                }
+            });
+        }
+    }
+	
+</script>

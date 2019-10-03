@@ -1,0 +1,69 @@
+{% extends '../layout.html' %}
+
+{% block content %}
+
+{% include "nav-top.html" %}
+
+<div class="container-fluid">
+	<div class="row">
+		<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column" id="myUl" data-index="{{navIndex}}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/userInfo/baseInfo">
+                        <i class="fa fa-user"></i>基本信息</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/userInfo/caredManage">
+                        <i class="fa fa-star"></i>我的关注</a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/userInfo/fanManage">
+                        <i class="fa fa-heart"></i>粉丝团</a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/userInfo/statistic">
+                        <i class="fa fa-plus" aria-hidden="true"></i>统计信息</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/admin">
+                        <i class="fa fa-gears"></i>后台管理</a>
+                    </li>
+                </ul>
+
+            </div>
+        </nav>
+
+        <!-- 主体内容 -->
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <!-- 基本信息0 我的关注1 粉丝团2 统计信息3 -->
+            {% if navIndex==0 %}
+            {% include "userInfo/baseInfo.html" ignore missing %}
+            {% elseif navIndex==1 %}
+            {% include "userInfo/caredManage.html" ignore missing %}
+            
+           	{% elseif navIndex==2 %}
+            {% include "userInfo/fanManage.html" ignore missing %}
+            {% elseif navIndex==3 %}
+            {% include "userInfo/statistic.html" ignore missing %}
+            
+            {% endif %}
+        </main>
+	</div>
+</div>
+<script>
+	
+$(function() {
+	let ind = parseInt($("#myUl").attr("data-index"));
+	$("#myUl li").eq(ind).children("a").eq(0).addClass("active");
+	
+	$("#myUl").on('click', 'li a', function() {
+		console.log($(this).index());
+		$(this).addClass("active");
+		$(this).parents("li").siblings().children("a").removeClass("active")
+	});
+	
+});
+
+</script>
+{% endblock %}

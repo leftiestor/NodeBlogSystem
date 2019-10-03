@@ -1,0 +1,151 @@
+
+<h2>统计信息</h2><hr/>
+<input type="hidden" id="userId" value="{{userId}}" />
+<h5 class="font-color-666 margin-b-20">【{{userName}}】  欢迎来到统计信息！</h5>
+<hr />
+
+<div class="statistic_contain">
+	<div class="t_contain">
+		<!--博龄-->
+		<p class="t_p">
+			<span class="t_span">注册时间：</span>
+			<span class="" id="created">2019-01-01 00:00</span>
+		</p>
+		<p class="t_p">
+			<span class="t_span">博龄：</span>
+			<span class="r_span" id="ageYear">0</span>
+			<span class="t_span">年</span>
+			<span class="r_span" id="ageMonth">0</span>
+			<span class="t_span">月</span>
+			<span class="r_span" id="ageDay">0</span>
+			<span class="t_span">天</span>
+		</p>	
+		<hr />
+		<!--文章-->
+		<p class="t_p">
+			<span class="t_span">您一共发布了文章：</span>
+			<span class="r_span" id="postNum">0</span>&nbsp;篇
+		</p>
+		<p class="t_p">
+			<span class="t_span">发布分类：</span>
+			<span class="r_span" id="categoryNum">0</span>&nbsp;种
+		</p>
+		<p class="t_p">
+			<span class="t_span">期间删除了文章：</span>
+			<span class="r_span" id="delPostNum">0</span>&nbsp;篇
+		</p>
+	</div>
+	
+	
+	<div class="t_contain">
+		
+		<!--关注-->
+		<p class="t_p">
+			<span class="t_span">您一共关注了：</span>
+			<span class="r_span" id="caredNum">0</span>&nbsp;人
+		</p>
+		<p class="t_p">
+			<span class="t_span">期间圈粉了：</span>
+			<span class="r_span" id="fanNum">0</span>&nbsp;人
+		</p>
+	
+		<hr />
+		<!--评论-->
+		<p class="t_p">
+			<span class="t_span">您一共发表评论：</span>
+			<span class="r_span" id="commentNum">0</span>&nbsp;个
+		</p>
+		<p class="t_p">
+			<span class="t_span">期间删除了评论：</span>
+			<span class="r_span" id="delCommentNum">0</span>&nbsp;个
+		</p>
+	</div>
+</div>
+<hr />
+
+<div class="statistic_tag">
+	坚持到底，得你想得
+</div>
+
+<script>
+	let userid = $("#userId").val();
+	initing();
+	$(function (){
+		userid = $("#userId").val();
+		
+	})
+	//初始化
+	function initing(){
+		//获取博龄信息：
+		$.ajax({
+			url:"/"+userid+"/userInfo/statistic/registerInfo",
+			type:"get",
+			data:{},
+			success:function(result){
+				console.log(result);
+				if(result.code === "0"){
+					$("#created").html(result.registTime);
+					$("#ageYear").html(result.ageYear);
+					$("#ageMonth").html(result.ageMonth);
+					$("#ageDay").html(result.ageDay);
+				}else{
+					alert(result.message);
+				}
+			},error:function(err){
+				alert(err.toString());
+			}
+		});
+		//获取文章信息：
+		$.ajax({
+			url:"/"+userid+"/userInfo/statistic/postInfo",
+			type:"get",
+			data:{},
+			success:function(result){
+				console.log(result);
+				if(result.code === "0"){
+					$("#postNum").html(result.postNum);
+					$("#categoryNum").html(result.categoryNum);
+					$("#delPostNum").html(result.delPostNum);
+				}else{
+					alert(result.message);
+				}
+			},error:function(err){
+				alert(err.toString());
+			}
+		});
+		//获取关注信息：
+		$.ajax({
+			url:"/"+userid+"/userInfo/statistic/caredInfo",
+			type:"get",
+			data:{},
+			success:function(result){
+				console.log(result);
+				if(result.code === "0"){
+					$("#fanNum").html(result.fanNum);
+					$("#caredNum").html(result.caredNum);
+				}else{
+					alert(result.message);
+				}
+			},error:function(err){
+				alert(err.toString());
+			}
+		});
+		//获取评论信息：
+		$.ajax({
+			url:"/"+userid+"/userInfo/statistic/commentInfo",
+			type:"get",
+			data:{},
+			success:function(result){
+				console.log(result);
+				if(result.code === "0"){
+					$("#commentNum").html(result.commentNum);
+				}else{
+					alert(result.message);
+				}
+			},error:function(err){
+				alert(err.toString());
+			}
+		});
+	}
+	
+</script>

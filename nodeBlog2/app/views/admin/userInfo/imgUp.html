@@ -1,0 +1,50 @@
+
+<figcaption class="figure-caption text-left margin-t-10">
+	<button class="btn btn-outline-info btn-sm" type="button" data-toggle="collapse" data-target="#collapseUserHead" aria-expanded="false" aria-controls="collapseUserHead">
+   	 点我
+  </button>
+</p>
+<div class="collapse" id="collapseUserHead">
+   
+	<form action="/{{userId}}/userInfo/addPicture" method="post" class="userheadUp_form" enctype="multipart/form-data">
+		
+		<label>选择文件更换头像</label>
+		<input type="file" name="file" id="userHead_input" style="max-width: 230px;" class="">
+	
+		<button class="btn btn-outline-primary btn-sm" id="userHead_submit" type="submit">上传</button>
+	</form>
+</div>
+</figcaption>
+
+<script>
+	let imgTypeList = ["image/jpeg","iamge/png","image/gif","image/jpg"];
+	$(function(){
+		
+		$("#userHead_submit").hide();
+		$("#userHead_input").bind("input propertychange",function(){
+			console.log(this.files);
+			let subFile = this.files[0];
+			let vals = $(this).val();
+			if(vals == ""){
+				$("#userHead_submit").hide();
+			}else{
+				if(subFile.type == "" || imgTypeList[subFile.type] === -1){
+					$("#userHead_submit").hide();
+					alert('请选择格式为"jpeg、png、gif、jpg"的图片!');
+				}else{
+					if(subFile.size > 5242880){
+						$("#userHead_submit").hide();
+						alert('请选择大小为5M以内的图片!');
+					}else{
+						$("#userHead_submit").show();
+					}
+				}
+			}
+				
+		})
+		
+		
+		
+	});
+	
+</script>

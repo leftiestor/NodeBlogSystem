@@ -1,0 +1,101 @@
+
+ul {
+    padding-inline-start: 0;
+}
+.group-ul li{
+	line-height: 24px;
+	overflow-x: hidden;
+	 text-overflow:ellipsis;
+	 white-space: nowrap;
+	 border-bottom: 1px dashed lightgray;
+}
+.group-ul li:hover{
+	background-color:#C6E2FF;
+}
+ .group h5{
+ 	font-family: "微软雅黑";
+ 	font-size: 1.0rem;
+ 	line-height: 30px;
+ 	background-color: lightblue;
+ 	position: relative;
+ }
+ .group h5>i {
+ 	color: purple;
+ 	margin: 0 6px;
+ }
+
+.group h5 .tomore{
+	position: absolute;
+	right: 10px;
+    font-size: 20px;
+}
+
+.blog-quote {
+   
+    font-size: 25px;
+    color: #333333;
+}
+.blog-quote a{
+	display: inline-block;
+	margin-top: 46px;
+}
+
+
+.contBox>div{
+	margin: 10px 10px;
+}
+.contBox .row>div{
+	margin: 0 5px;
+}
+.row-left {
+	min-width: 150px;
+	/*width: 20%;*/
+	min-height: 600px;
+	background-color: #F0F8FF;
+	padding: 10px;
+}
+
+
+.row-center{
+	min-width: 500px;
+	/*width: 60%;*/
+	min-height: 600px;
+	background-color: lightgoldenrodyellow;
+	/*background-color: #F8F9FA;*/
+}
+.row-center .media img{
+	width: 70px;
+	height: 70px;
+}
+.row-center-contain {
+	padding: 20px 10px;
+}
+.row-center-contain ul{
+	padding-left: 0;
+}
+
+.sysCenterUl {
+	
+}
+.sysCenterUl li {
+	margin-bottom: 30px;
+	
+}
+.search-contain-p{
+	font-size: 22px;
+	font-family: "仿宋";
+	font-weight: bold;
+	color: #7A378B;
+}
+
+.row-right{
+	min-width: 200px;
+	min-height: 600px;
+	background-color: #FFE4E1;
+	padding: 10px;
+}
+
+.footer {
+	background-color: #f5f5f5;
+	text-align: center;
+}

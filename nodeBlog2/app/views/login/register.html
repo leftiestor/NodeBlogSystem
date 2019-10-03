@@ -1,0 +1,170 @@
+{% extends './layout.html' %}
+
+{% block registerBlock %}
+
+<form class="form-signin magic-opacity" onsubmit="return false;">
+  <h1 class="mb-3 font-weight-normal text-center font-white">注  册</h1>
+    <div class="alert alert-danger alert-dismissible fade" id="warningDiv" role="alert">
+       <i class="fa fa-exclamation-triangle"></i>&nbsp;&nbsp;<span id="warningSpan"></span>
+    </div>
+    <div class="">
+        <div class="form-group row height70">
+            <label for="pname" class="col-sm-2 col-form-label ">昵称<span class="font-red">*</span></label>
+            <div class="col-sm-10">
+                <input type="text" id="pname" name="pname" class="form-control" placeholder="2~12位字符，只包含字母、汉字…" maxlength="12" required autofocus>
+             	<span class="font-red display-block"></span>
+            </div>
+        </div>
+        <div class="form-group row height70">
+            <label for="password" class="col-sm-2 col-form-label">密码<span class="font-red">*</span></label>
+            <div class="col-sm-10">
+                <input type="password" id="password" name="password" class="form-control" placeholder="6~30位字符…" maxlength="30" required>
+            	<span class="font-red display-block"></span>
+            </div>
+        </div>
+        <div class="form-group row height70">
+            <label for="confirmword" class="col-sm-2 col-form-label">确认密码<span class="font-red">*</span></label>
+            <div class="col-sm-10">
+                <input type="password" id="confirmword" name="confirmword" class="form-control" placeholder="确认密码…" maxlength="30" required>
+            	<span class="font-red display-block"></span>
+            </div>
+        </div>
+        <!--<div class="form-group row height70">
+            <label for="email" class="col-sm-2 col-form-label">邮箱</label>
+            <div class="col-sm-10">
+                <input type="email" id="email" name="email" class="form-control" placeholder="邮箱…" maxlength="50" required>
+            	<span class="font-red display-block"></span>
+            </div>
+        </div>-->
+    </div>
+
+    <div class="checkbox mb-3">
+	    <a href="/login">已有账号，去登录</a>
+  	</div>
+  <button class="btn btn-lg btn-primary btn-block" type="button" onclick="register()">注册</button>
+  <p class="mt-5 mb-3 text-muted"></p>
+</form>
+	
+
+
+<script type="text/javascript">
+	let bool_1 = false,
+			bool_2 = false,
+			bool_3 = false,
+			bool_4 = false;
+			
+	
+	
+$(function() {
+	//昵称验证
+	$("#pname").bind("input propertychange", function() {
+		let _this = $(this);
+		let pname = _this.val().trim();
+		bool_1 = false;
+		if("" == pname) {
+			_this.next().html("昵称不能为空！");
+		} else{
+			let reg = /^[a-zA-Z\u4e00-\u9fa5]{2,12}$/;
+			if(!reg.test(pname)){
+				_this.next().html("请输入2~12位字符，只包含字母、汉字！");
+			}else{
+				bool_1 = true;
+				_this.next().html("");
+			}
+		}
+	});
+	//密码验证
+	$("#password").bind("input propertychange", function() {
+		let _this = $(this);
+		
+		bool_2 = false;
+		if("" == _this.val()) {
+			_this.next().html("密码不能为空！");
+		} else {
+			if(_this.val().length < 6){
+				_this.next().html("请输入6~30位字符！");
+			}else{
+				bool_2 = true;
+				_this.next().html("");
+			}
+		}
+	});
+	//确认密码验证
+	$("#confirmword").bind("input propertychange", function() {
+		let _this = $(this);
+		bool_3 = false;
+		if($("#password").val() != _this.val()) {
+			_this.next().html("两次密码不匹配！");
+		} else {
+			bool_3 = true;
+			_this.next().html("");
+		}
+	});
+	//邮箱验证
+	$("input[name='email']").bind("input propertychange", function() {
+		let _this = $(this);
+		bool_4 = true;
+		if(1 == emailTest(_this.val())) {
+			_this.next().html("邮箱内容不能为空！");
+		}
+		if(2 == emailTest(_this.val())) {
+			_this.next().html("邮箱格式不符！");
+		}
+		if(0 == emailTest(_this.val())) {
+			bool_4 = true;
+			_this.next().html("");
+		}
+	});
+
+});
+
+//验证是否是邮箱格式
+function emailTest(email) {
+	if(email == "") {
+		return 1;
+	}
+	if(!/^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/.test(email)) {
+		return 2;
+	}
+	return 0;
+}
+
+function register() {
+	//校验
+	if(!bool_1 || !bool_2 || !bool_3) {
+		return false;
+	}
+	
+	let pname = $("#pname").val().trim(),
+		password = $("#password").val(),
+		confirmword = $("#confirmword").val();
+		
+	//MD5加密
+	let md5Password = $.md5(password);
+	//console.log(md5Password);
+	
+	$.ajax({
+		url:"/login/register",
+		type:"post",
+		dataType:"json",
+		data:{
+			"pname": pname,
+			"password": md5Password
+		},
+		success:function(result){
+			alert(result.message);
+			if(result.code === "0"){
+				window.location.href = "/login";
+			}
+			
+		},error:function(err){
+			alert(err.toString());
+		}
+	})
+	
+	
+
+}
+</script>
+
+{% endblock %}

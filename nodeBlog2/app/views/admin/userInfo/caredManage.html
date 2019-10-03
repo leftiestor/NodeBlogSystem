@@ -1,0 +1,69 @@
+
+<h2>关注管理</h2><hr/>
+<input type="hidden" id="userId" value="{{userId}}" />
+<h5 class="font-color-666 margin-b-20">【{{userName}}】 的关注人群：</h5>
+
+{% if user.cared.length > 0 %}
+	{% for cd in user.cared %}
+	<input type="hidden" name="userCared" value="{{cd.toString()}}" />
+	{% endfor %}
+	<div class="fan_contain">
+		<ul class="fanInfo_ul" id="fanId_ul">
+			<!--关注列表-->
+		</ul>
+	</div>
+{% else %}
+	<p class="alert alert-danger text-center"><a href="/sysHome">空空如也，去首页看看</a></p>
+
+{% endif %}
+
+
+<script>
+	
+	let userId = $("#userId").val();
+	let strArr = "";
+	$(function() {
+		userId = $("#userId").val();
+		initing();
+		
+	});
+	//初始化
+	function initing(){
+		strArr = "";
+		let userid = userId;
+		$("input[name='userCared']").each(function (){
+			let vals = $(this).val();
+			console.log("vals:",vals);
+			$.ajax({
+				url:"/"+userid+"/userInfo/caredManage/getCaredInfo",
+				type:"post",
+				dataType:"json",
+				data:{
+					"id": userid,
+					"caredUserId": vals
+				},
+				success:function(result){
+					console.log(result);
+					if(result.code === "0"){
+						let user = result.user;
+						let userImgSrc = user.img !=="" ? "/userImg/"+user.img : "/img/BLOG.png";
+						strArr += `<li><img src="${userImgSrc}" />
+									<p><a href="/sysHome/blogger?name=${user.name}&id=${user._id.toString()}">${user.name}</a></p>
+									<div class="fan_fanCared_contain">
+										<p><a href="">TA关注的人：<span>${user.fans.length}</span></a></p>
+										<p><a href="">关注TA的人：<span>${user.cared.length}</span></a></p>
+									</div></li>`;
+						$("#fanId_ul").html(strArr);
+					}else{
+						alert(result.message);
+					}
+					
+				},error:function(err){
+					alert(err.toString());
+				}
+			})
+			
+		});
+	}
+	
+</script>

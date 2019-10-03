@@ -1,0 +1,156 @@
+
+
+
+    <h2>{{title}}</h2><hr/>
+    <form onsubmit="return false">
+        {% if postId %}
+        <input type="hidden" class="postInput" value="{{postId}}" data-userid="{{userId}}">
+        {% else %}
+        <input type="hidden" class="postInput" value="" data-userid="{{userId}}">
+        {% endif %}
+
+        <div class="form-group">
+            <label for="postTitle">文章标题：</label>
+            <input type="text" class="form-control form-control-lg" id="postTitle" maxlength="100"  placeholder="输入标题…">
+        </div>
+        <div class="form-group">
+            <label for="postCategory">文章分类：（如果没有此分类，则自动创建）</label>
+            <input type="text" class="form-control" id="postCategory" maxlength="100" placeholder="分类…">
+        </div>
+        <div class="form-group">
+            <label for="myeditor">文章内容：</label>
+            <div id="myeditor" type="text/plain" style="width: 100%;height: 500px;"></div>
+        </div>
+        <div class="form-group">
+            <label for="postTag">文章标签：（多个之间以中文或英文分号隔开）</label>
+            <input type="text" class="form-control" id="postTag" maxlength="100" placeholder="如：javascript;node.js">
+        </div>
+        <div class="margin-b-20">
+	        <button type="button" class="btn btn-primary" id="publishBtn" onclick="publishPost(true)"><i class="fa fa-paper-plane-o"></i>&nbsp;&nbsp;发布</button>
+	        <button type="button" class="btn btn-primary" id="saveTempBtn" onclick="publishPost(false)"><i class="fa fa-floppy-o"></i>&nbsp;&nbsp;存为草稿</button>
+	        <button type="button" class="btn btn-primary" id="cancelBtn" onclick="cancelPost()"><i class="fa fa-close"></i>&nbsp;&nbsp;取消</button>
+	    </div>
+    </form>
+
+
+ <script>
+    /*var ue = UE.getEditor("myeditor");*/
+ </script>
+<script>
+    let ue = UE.getEditor("myeditor");
+    
+	let userId = $(".postInput").eq(0).attr("data-userid");
+	
+    initing();
+    
+    function initing(){
+        let postId = $(".postInput").eq(0).val(),
+        	userId = $(".postInput").eq(0).attr("data-userid");
+        if(postId !== ""){   //编辑帖子
+            //回显帖子信息
+            $.ajax({
+                url: "/"+userId+"/newPost/edit",
+                type: "post",
+                data: {
+                    "id":postId
+                },
+                success: (result) => {
+                    if(result.code === "0"){
+                        let post = result.post;
+                        //赋值
+                        $("#postTitle").val(post.title);
+                        $("#postCategory").val(post.category.name).prop("disabled",true);
+                        if(post.content !== "空"){
+                        	ue.addListener("ready", function () {
+                        	    // editor准备好之后才可以使用
+                        	    ue.setContent(post.content);
+                        	});
+                        }
+                        $("#postTag").val(post.tag.join("；"));
+                        //去掉 保存草稿 按钮
+                        $("#saveTempBtn").prop("disabled",true).css("display","none");
+
+                    }
+
+                },
+                error: (err) => {
+                    console.log(err);
+                }
+            });
+        }else{  //新增帖子
+
+        }
+    }
+    function publishPost(bool){
+		let title = $("#postTitle").val().trim(),
+            	category = $("#postCategory").val().trim();
+
+        let arr = [];
+        arr.push(ue.getContent());
+        let content = arr.join("\n");
+        let postId = $(".postInput").eq(0).val();
+        let tag = $("#postTag").val().trim() || "";
+		
+		if(bool){  //发布
+			//发布要求数据完整
+			if(title === "" || category ===""  || content ==="" || tag == ""){
+				alert("发布文章必须信息完整！");
+				return false;
+			}
+		}else{
+			if(title === "" || category ==="" ){
+				alert("存入草稿必须填写标题、分类！");
+				return false;
+			}
+			if(content ===""){
+				content = "空";
+			}
+		}
+		
+		let tags = [];
+		if(tag == ""){
+			tags = [];
+		}else{
+			let reg = /[；;]/;
+			tags = tag.split(reg);
+		}
+		$.ajax({
+		    url: "/"+userId+"/newPost/publishPost",
+		    type: "post",
+		    data: {
+		        "id":postId,
+		        "title":title,
+		        "category":category,
+		        "tag" : tags,
+		        "content":content,
+		        "published":bool
+		    },
+		    success: (result) => {
+		        alert(result.message);
+		        console.log(result);
+		        if(result.code === "0"){
+		        	if(bool){
+		        		window.location.replace("/"+userId+"/postOne/dis/"+result.postId);
+		        	}else{
+		        		window.location.replace("/"+userId+"/templatePost");
+		        	}
+		        }
+	
+		    },
+		    error: (err) => {
+		        console.log(err);
+		    }
+		});
+    }
+    
+	//取消发布新文
+	function cancelPost(){
+		let result = confirm("确定取消发布新文？");
+		//console.log(result);
+		if(result == true){
+			window.location.replace("/"+userId+"/admin");
+		}
+	}
+	
+</script>
+

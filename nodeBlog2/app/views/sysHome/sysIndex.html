@@ -1,0 +1,65 @@
+
+
+<ul class="sysCenterUl" id="sysCenterUl">
+	{% for post in posts %}
+	<li>
+		<div class="media">
+			{% if post.author.img %}
+		   	<img class="img-thumbnail align-self-start mr-3" src="/userImg/{{post.author.img}}" alt="{{post.author.name}}">
+		  	{% else %}
+		   	<img class="img-thumbnail align-self-start mr-3" src="/img/BLOG.png" alt="{{post.author.name}}">
+			{% endif %}
+		  
+		  <div class="media-body">
+		    
+		  	<h4 class="blog-post-title font-20 heighTitle">
+	        	<a href="/postOne/dis/{{post.slug}}">{{post.title}}</a></h4>
+	        <div class="post-content font-12 line-h-14">{{truncate(post.content, 140)}}</div>
+		  	<p class="blog-post-meta font-12 font-color-666 margin-b-0">
+		  		
+		  		 <span class="font-color-pur">{{post.author.name}}</span>&nbsp;&nbsp;
+               &nbsp;&nbsp;{{moment(post.created).format("YYYY-MM-DD HH:mm")}}&nbsp;&nbsp;
+                {% if post.meta.clicks %}
+                <i class="fa fa-eye font-color-pur"></i>&nbsp;&nbsp;阅读({{post.meta.clicks}})&nbsp;&nbsp;
+                {% else %}
+                <i class="fa fa-eye font-color-pur"></i>&nbsp;&nbsp;阅读(0)&nbsp;&nbsp;
+                {% endif %}
+                <i class="fa fa-comments-o font-color-pur"></i>&nbsp;&nbsp;评论({{post.comments.length}})
+		  		
+		  	</p>
+		  </div>
+		</div>
+		
+	</li>
+	{% endfor %}
+</ul>
+<script>
+	
+	$(function(){
+		//initing();
+		
+		
+		
+	});
+	
+	function initing(){
+		 $.ajax({
+	        url: "/getSysIndexPost",
+	        type: "post",
+	        data: {},
+	        success: (result) => {
+	            let str = "";
+	            result.forEach((item, index) => {
+	            	str +=`<li><a href="/sysHome/category?slug=${item.slug}&id=${item._id.toString()}">${item.name}</a></li>`;
+	            });
+	            $("#category_ul").html(str);
+	        },
+	        error: (err) => {
+	            console.log(err);
+	        }
+	    });
+		
+		
+	}
+	
+</script>

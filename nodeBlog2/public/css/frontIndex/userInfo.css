@@ -1,0 +1,162 @@
+
+
+.baseInfo_contain {
+	display: flex;
+	justify-content: flex-start;
+}
+.baseInfo_left{
+	min-width: 300px;
+	width: 30%;
+	/*border: 1px solid lightcyan;*/
+	text-align: center;
+	
+}
+
+.myfigure .userHeader{
+	width: 250px;
+	height: 250px;
+}
+
+.userheadUp_form{
+	width: 250px;
+	text-align: left;
+	padding: 10px;
+ 	border:1px dashed lightcoral;
+}
+
+.baseInfo_right{
+	min-width: 300px;
+	width: 50%;
+	margin-left: 20px;
+	/*border: 1px solid lightpink;*/
+	
+}
+
+
+.baseInfo_right>div{
+    line-height: 40px;
+    border: 1px dashed purple;
+    padding: 0 10px;
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: purple;
+    font-family: "仿宋", consolas;
+}
+
+.baseInfo_right>div span{
+	display: inline-block;
+	margin-left: 20px;
+	font-size: 20px;
+	font-family: "楷体",consolas;
+	color: purple;
+	border: 0;
+	min-width: 300px;
+	overflow-x: visible;
+}
+.baseInfo_right>div:first-child span{
+	font-size: 24px;
+}
+
+.baseInfo_right>div>a{
+	display: none;
+}
+.baseInfo_right>div:hover a{
+	display: inline;
+}
+.baseInfo_right>div input {
+	font-family: "微软雅黑",arial;
+}
+
+
+
+
+/*fanManage*/
+
+
+.fan_contain {
+	
+}
+
+.fanInfo_ul {
+	display: flex;
+	flex-wrap: wrap ;
+	
+}
+.fanInfo_ul li{
+	width: 170px;
+	height: auto;
+	text-align: center;
+	/*border: 1px dashed red;*/
+	padding: 10px 5px;
+	margin: 0 5px;
+}
+.fanInfo_ul li img{
+	width: 70px;
+	height: 70px;
+	border-radius: 4px;
+	box-shadow: 0 0 4px 1px purple;
+}
+.fanInfo_ul li>p{
+	line-height: 20px;
+	margin: 14px auto;
+	
+}
+.fanInfo_ul li>p a{
+	font-family: "楷体", arial;
+	color: darkmagenta;
+	font-size: 20px;
+}
+.fan_fanCared_contain p a{
+	border-bottom: 1px dashed purple;
+	
+}
+.fan_fanCared_contain p a:hover{
+	border-bottom: 0;
+	
+}
+
+
+/*统计信息*/
+.statistic_contain {
+	display: flex;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+
+
+.t_contain {
+	min-width: 400px;
+	margin: 0 15px;
+	
+}
+.t_p{
+	padding: 0 20px;
+	border-left: 4px solid #6633CC;
+	font-size: 16px;
+	color: #666;
+}
+.t_span{
+	font-size: 16px;
+	color: #666;
+}
+
+.r_span{
+	font-size: 20px;
+	color: orangered;
+	font-family: "黑体";
+	display: inline-block;
+	padding: 5px 10px;
+	border-bottom: 1px solid red;
+}
+
+.statistic_tag{
+	line-height: 50px;
+	height: 50px;
+	text-align: center;
+	font-size: 28px;
+	color: grey;
+	font-family: "隶书";
+	box-shadow: 0 0 4px 1px lightgrey;
+}
+
+

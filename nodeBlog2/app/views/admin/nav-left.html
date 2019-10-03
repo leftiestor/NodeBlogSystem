@@ -1,0 +1,76 @@
+
+<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+    <div class="sidebar-sticky">
+        <!--<span class="sr-only">(current)</span>-->
+        <ul class="nav flex-column" id="myUl" data-index="{{navIndex}}">
+            <li class="nav-item">
+                <a class="nav-link {{navIndex==0?}}" href="/admin">
+                    <span data-feather="home"></span>
+                    帖子列表
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/newPost">
+                    <span data-feather="file"></span>
+                    发布新帖
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span data-feather="shopping-cart"></span>
+                    文章列表
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span data-feather="users"></span>
+                    草稿箱
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span data-feather="bar-chart-2"></span>
+                    回收站
+                </a>
+            </li>
+
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+            <span>管理</span>
+            <a class="d-flex align-items-center text-muted" href="#">
+                <span data-feather="plus-circle"></span>
+            </a>
+        </h6>
+        <ul class="nav flex-column mb-2">
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span data-feather="file-text"></span>
+                    我的关注
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span data-feather="file-text"></span>
+                    关注我的
+                </a>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+<script>
+$(function (){
+    let ind = parseInt($("#myUl").attr("data-index"));
+    $("#myUl li").eq(ind).children("a").eq(0).addClass("active");
+
+    $("#myUl").on('click','li a',function(){
+
+        console.log($(this).index());
+        $(this).addClass("active");
+        $(this).parents("li").siblings().children("a").removeClass("active")
+
+    })
+});
+
+</script>

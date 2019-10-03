@@ -1,0 +1,281 @@
+body {
+
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+    color: #333333;
+}
+ul li{
+	list-style: none;
+}
+
+
+.bg-lightgold {
+    background: lightgoldenrodyellow;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+.post-content img{
+    max-width:100%;
+    height: auto;
+}
+.post-comment {
+    line-height: 1.5em;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.font-10 {
+    font-size: 10px;
+}
+
+.font-12 {
+    font-size: 12px;
+}
+
+.font-14 {
+    font-size: 14px;
+}
+
+.font-16 {
+    font-size: 16px;
+}
+
+.font-18 {
+    font-size: 18px;
+}
+
+.font-20 {
+    font-size: 20px;
+}
+
+.font-24 {
+    font-size: 24px;
+}
+
+.font-color-333 {
+    color: #333333;
+}
+
+.font-color-666 {
+    color: #666666;
+}
+.font-color-blue {
+	 color: #4169E1;
+}
+.font-color-pur{
+	color:#7D26CD;
+}
+.font-color-purple {
+	color: purple;
+}
+
+.line-h-09 {
+	line-height: 0.9rem;
+}
+.line-h-1 {
+	line-height: 1rem;
+}
+
+.line-h-12 {
+	line-height: 1.2rem;
+}
+.line-h-13 {
+	line-height: 1.3rem;
+}
+.line-h-14 {
+	line-height: 1.4rem;
+}
+.line-h-15 {
+	line-height: 1.5rem;
+}
+
+.margin-b-0 {
+    margin-bottom: 0;
+}
+.margin-b-10 {
+    margin-bottom: 10px;
+}
+.margin-b-20 {
+    margin-bottom: 20px;
+}
+.margin-t-10 {
+    margin-top: 10px;
+}
+
+.margin-t-20 {
+    margin-top: 20px;
+}
+.margin-t-30 {
+    margin-top: 30px;
+}
+.margin-l-10 {
+    margin-left: 10px;
+}
+
+.margin-l-15 {
+    margin-left: 15px;
+}
+
+.margin-l-20 {
+    margin-left: 20px;
+}
+
+.margin-r-10 {
+    margin-right: 10px;
+}
+
+.margin-r-20 {
+    margin-right: 20px;
+}
+.mybtn {
+    border-radius: 2px;
+    box-shadow: none;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 12px;
+    padding: 3px 10px;
+    border: 0;
+}
+.mybtn:hover{
+    color: #fff;
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+.mybtn:active{
+    color: #fff;
+    background-color: #0062cc;
+    border-color: #005cbf;
+}
+.mybtn:focus{
+    box-shadow: 0 0 0 .2rem rgba(38,143,255,.5);
+}
+
+.mybtn-primary{
+    background-color: #007bff;
+    color: #FFFFFF;
+    border:1px solid #CCCCCC;
+}
+.mybtn-default{
+    background-color: #FFFFFF;
+    color: #333;
+    border:1px solid #CCCCCC;
+}
+.mybtn-green{
+     background-color: forestgreen;
+     color: #FFFFFF;
+     border:1px solid #CCCCCC;
+ }
+.mybtn-danger {
+    background-color: red;
+    color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+}
+.line-height-1{
+    line-height: 1;
+}
+
+.space-between{
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+.space-end{
+	display: flex;
+	justify-content: flex-end;
+	align-items: flex-start;
+}
+.space-center{
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+}
+.space-clo-end{
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-end;
+}
+
+.font-red{
+	color: red;
+	margin: 2px 0;
+}
+.font-white {
+	color: white;
+}
+.display-block {
+	display:block;
+}
+
+.bg-opacity8{
+	background-color: rgba(255,255,255,0.8);
+}
+
+.heighTitle a{
+	font-family: "微软雅黑";
+	font-size: 16px;
+	color: #0000FF;
+}
+.heighTitle a:hover,
+.heighTitle a:active{
+	color: #FF0000;
+}
+.border-solid {
+	border: 1px solid #666666;
+	
+}
+.bg-li-red{
+	background-color: lightcoral ;
+}
+.bg-li-purple{
+	background-color: #EEE5DE;
+}
+
+.hov-bg-li-purple:hover{
+	background-color: #EEE5DE;
+	border-bottom:1px solid purple ;
+}
+.b-solid {
+	border-bottom: 1px solid darkmagenta;
+	
+}
+.b-dashed {
+	border-bottom: 1px dashed darkmagenta;
+	
+}
+.b-radius-4{
+	border-radius: 4px;
+}
+.b-radius-10{
+	border-radius: 10px;
+}
+
+.justify-content-start{
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+.justify-content-end{
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: flex-end;
+	align-items: flex-start;
+}
+.text-muted {
+	min-width: 200px;
+	
+}
+.nav.justify-content-start a:hover{
+	text-decoration: none;
+}
+
+
+
+
+
+
+

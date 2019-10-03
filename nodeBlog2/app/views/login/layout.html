@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>登录</title>
+    <link rel="stylesheet" href="/bowerComp/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/signin.css">
+	<link rel="stylesheet" href="/css/waterFlow.css">
+    <script type="text/javascript" charset="utf-8" src="/bowerComp/jQuery/dist/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/bowerComp/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.md5.js" ></script>
+</head>
+<body>
+  <svg width="0" height="0"
+ xmlns="http://www.w3.org/2000/svg"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+  <filter id="water">
+    <feTurbulence type="fractalNoise" baseFrequency=".05 .05" numOctaves="1" result="noise1"></feTurbulence>
+    <feColorMatrix in="noise1" type="hueRotate" values="0" result="noise2">
+      <animate attributeName="values" from="0" to="360" dur="1s" repeatCount="indefinite"/>
+    </feColorMatrix>
+    <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="7" in="SourceGraphic" in2="noise2" />
+  </filter>
+</svg>
+
+<img src="/img/hawaii-water-small.jpg">
+
+{% block loginBlock %}{% endblock %}
+{% block registerBlock %}{% endblock %}
+
+</body>
+</html>

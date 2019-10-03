@@ -1,0 +1,332 @@
+{% extends '../layout.html' %}
+
+{% block content %}
+<input type="hidden" id="userName" value="{{userName}}" data-userid="{{userId}}" />
+<nav class="navbar navbar-light bg-light">
+	<div class="blog-quote">
+		<img src="/img/BLOG.png" height="90"  class="d-inline-block align-top" alt=""/>
+		<a class="navbar-light font-color-666" href="javascript:;">Get what you want</a>
+	</div>
+	{% if userName !== ""  %}
+	<div class="space-clo-end">
+		<h3 class="margin-t-30">{{userName}}</h3>
+		<p>
+			<a href="/{{userId}}/posts">我的博客</a>&nbsp;&nbsp;
+			<a href="/sysHome/loginOut" >退出</a>
+		</p>
+	</div>
+	{% else %}
+	<button class="btn btn-outline-danger margin-t-20" onclick="toLogin()">登录</button>
+	{% endif %}
+</nav>
+
+<div class="mt-2 contBox">
+	<div class="row flex-row justify-content-center">
+		<div class="row-left col-md-2">
+			<div class="group">
+				<h5> <i class="fa fa-puzzle-piece"></i>文章分类
+					<a class="tomore" title="更多" href="/sysHome/categoryAll"><i class='fa fa-angle-double-right' aria-hidden='true'></i></a>
+				</h5>
+				<ul class="group-ul" id="category_ul">
+					<li><a href="">HTML</a></li>
+					
+				</ul>
+			</div>
+			<div class="group">
+				<h5><i class="fa fa-users"></i>博主推荐
+					<a class="tomore" title="更多" href="/sysHome/bloggerAll"><i class='fa fa-angle-double-right' aria-hidden='true'></i></a>
+				</h5>
+				<ul class="group-ul" id="blogger_ul">
+					<li><a href="">wenlvpapa</a></li>
+					
+				</ul>
+			</div>
+		</div>
+		<div class="row-center col-md-7">
+			
+			<ul class="nav nav-tabs margin-t-20" id="centerNav_ul">
+			  <li class="nav-item">
+			    <a class="nav-link active" href="javascript:;" onclick="recommends()">推荐</a>
+			  </li>
+			  <li class="nav-item">
+			     <a class="nav-link" href="javascript:;" onclick="specials()">近期</a>
+			  </li>
+			  <li class="nav-item">
+			    <a class="nav-link" href="javascript:;" onclick="supports()">我赞</a>
+			  </li>
+			  <li class="nav-item">
+			    <a class="nav-link" href="javascript:;" onclick="comments()">我评</a>
+			  </li>
+			</ul>
+			<!--初始化展示板块-->
+			<div class="row-center-contain" id="centerContain">
+				
+				{% include "sysIndex.html" %}
+				
+			</div>
+			<!--搜索信息展示板块-->
+			<div class="row-center-contain" id="searchContain">
+				<p class="search-contain-p" id="searchContain_p"></p>
+				<ul class="sysCenterUl" id="searchCenterUl">
+					
+				</ul>
+			</div>
+			
+		</div>
+		<div class="row-right col-md-2">
+			
+			<form class="margin-b-20" onsubmit="return false;">
+			  <div class="form-group" onsubmit="return false;">
+			    <input type="text" class="form-control" id="searchInput" maxlength="50" placeholder="search…">
+			    <small id="emailHelp" class="form-text text-muted">搜索你想知道的</small>
+			  </div>
+			  查询
+			  <button type="button" class="btn btn-sm btn-outline-primary" onclick="searchBy(1)">博主</button>
+			  <button type="button" class="btn btn-sm btn-outline-primary" onclick="searchBy(2)">文章</button>
+			  <button type="button" class="btn btn-sm btn-outline-primary" onclick="searchBy(3)">分类</button>
+			</form>
+			
+			<div class="group margin-t-30">
+				<h5><i class="fa fa-quote-left"></i>最新评论
+					<a class="tomore" title="更多" href="/sysHome/commentAll"><i class='fa fa-angle-double-right' aria-hidden='true'></i></a>
+				</h5>
+				<ul class="group-ul" id="comment_ul">
+					<!--<li>胜利等会计分录看刷剧</li>-->
+					
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<footer class="footer mt-auto py-3">
+  <div class="container">
+    <span class="text-muted">Place sticky footer content here.</span>
+  </div>
+</footer>
+
+
+<script>
+	let username = $("#userName").val(),
+		userId = $("#userName").attr("data-userid");
+	$(function(){
+		init();
+		
+		$("#centerNav_ul li a").on("click", function(){
+			console.log(111);
+			$(this).parent().siblings().children('a').removeClass("active");
+			$(this).addClass("active");
+		})
+		
+	});
+	
+	//初始化
+	function init(){
+		username = $("#userName").val();
+		userId = $("#userName").attr("data-userid");
+		
+		getAsideInfo();
+		
+		
+	}
+	
+	//搜索
+	function searchBy(type){
+		let cont = $("#searchInput").val().trim();
+		if(cont !== ""){
+			$.ajax({
+		        url: "/sysHome/search",
+		        type: "post",
+		        data: {
+		        	"type": type,
+		        	"content": cont
+		        },
+		        success: (result) => {
+		            console.log(result);
+		            if(result.code === "0"){
+		            	$("#centerContain").hide();  //隐藏中间内容
+		            	$("#searchContain").show();  
+		            	 
+		            	
+		            	let htmlStr = "", 
+		            		dateList = result.dataList;
+		            	
+		            	if(type == 1){  //博主
+		            		$("#searchContain_p").html('与 "'+cont+'" 有关的博主:'); 
+		            		if(dateList.length > 0){
+			            		htmlStr = "";
+			            		dateList.forEach((item, index)=>{
+			            			let userImgSrc = item.img ? "/userImg/"+item.img : "/img/BLOG.png";
+			            			htmlStr += `<li><div class="media b-solid b-radius-10">
+									  <img class="align-self-start mr-3" src="${userImgSrc}" alt="Generic placeholder image">
+									  <div class="media-body margin-b-10">
+									  	<h4 class="blog-post-title font-20 heighTitle">
+								        	<a href="/${item.id}/postsList">${item.name}</a></h4>
+								        <div class="post-content font-12 line-h-14">粉丝: ${item.fans.length} 人</div>
+								        <div class="post-content font-12 line-h-14">关注: ${item.cared.length} 人</div>
+									  </div>
+									</div></li>`;
+			            		});
+			            		$("#searchCenterUl").html(htmlStr);
+		            		}else{
+		            			$("#searchCenterUl").html("<p class='alert alert-danger'>抱歉，没有查询到相关博主！</p>");
+		            		}
+		            		
+		            	}else if(type == 2){  //文章
+		            		$("#searchContain_p").html('与 "'+cont+'" 有关的文章:'); 
+		            		if(dateList.length > 0){
+		            			htmlStr = "";
+			            		dateList.forEach((item, index)=>{
+			            			let userImgSrc = item.author.img ? "/userImg/"+item.author.img : "/img/BLOG.png";
+			            			htmlStr += `<li><div class="media b-solid b-radius-10">
+									  <img class="align-self-start mr-3" src="${userImgSrc}" alt="Generic placeholder image">
+									  <div class="media-body">
+									    
+									  	<h4 class="blog-post-title font-20 heighTitle">
+								        	<a href="/postOne/dis/${item.slug}">${item.title}</a></h4>
+								        <div class="post-content font-12 line-h-14">${item.content}</div>
+									  	<p class="blog-post-meta font-12 font-color-666 margin-b-10">
+									  		 <span class="font-color-pur">${item.author.name}</span>&nbsp;&nbsp;
+							               &nbsp;&nbsp;<span>${item.created}</span>&nbsp;&nbsp;
+							                {% if item.meta.clicks %}
+							                <i class="fa fa-eye font-color-pur"></i>&nbsp;&nbsp;阅读(${item.meta.clicks})&nbsp;&nbsp;
+							                {% else %}
+							                <i class="fa fa-eye font-color-pur"></i>&nbsp;&nbsp;阅读(0)&nbsp;&nbsp;
+							                {% endif %}
+							                <i class="fa fa-comments-o font-color-pur"></i>&nbsp;&nbsp;评论(${item.comments.length})
+									  	</p>
+									  </div>
+									</div></li>`;
+			            		});
+			            		$("#searchCenterUl").html(htmlStr);
+		            		}else{
+		            			$("#searchCenterUl").html("<p class='alert alert-danger'>抱歉，没有查询到相关文章！</p>");
+		            		}
+		            		
+		            	}else if(type == 3){   //分类
+		            		$("#searchContain_p").html('与 "'+cont+'" 有关的分类:'); 
+		            		if(dateList.length > 0){
+		            			htmlStr = "";
+			            		dateList.forEach((item, index)=>{
+			            			htmlStr += `<li><div class="media b-solid b-radius-10">
+									  <div class="media-body">
+									  	<h4 class="blog-post-title font-20 heighTitle">
+								        	<a href="">${item.name}</a></h4>
+									  	<p class="blog-post-meta font-12 font-color-666 margin-b-10">
+									  		创建者&nbsp;<span class="font-color-pur">${item.creator}</span>&nbsp;&nbsp;
+							                创建时间&nbsp;<span>${item.created}</span>&nbsp;&nbsp;
+									  	</p>
+									  </div>
+									</div></li>`;
+			            		});
+			            		$("#searchCenterUl").html(htmlStr);
+		            		}else{
+		            			$("#searchCenterUl").html("<p class='alert alert-danger'>抱歉，没有查询到相关分类！</p>");
+		            		}
+		            	}
+		            }else{
+		            	$("#searchContain").hide();  
+		            	$("#centerContain").show();  //显示中间内容
+		            }
+		        },
+		        error: (err) => {
+		            console.log(err);
+		        }
+		    });
+		}
+		
+	}
+	
+	
+	
+	
+	//获取侧边栏信息
+	function getAsideInfo(){
+		
+	    //获取侧边栏文章分类信息
+	    $.ajax({
+	        url: "/getAsideCategory",
+	        type: "get",
+	        data: {},
+	        success: (result) => {
+	            let str = "";
+	            result.forEach((item, index) => {
+	            	str +=`<li><a href="/sysHome/category?slug=${item.slug}&id=${item._id.toString()}">${item.name}</a></li>`;
+	            });
+	            $("#category_ul").html(str);
+	        },
+	        error: (err) => {
+	            console.log(err);
+	        }
+	    });
+	    //获取侧边栏推荐博主信息
+	     $.ajax({
+	        url: "/getAsideBlogger",
+	        type: "get",
+	        data: {},
+	        success: (result) => {
+	            let str = "",users = result.users;
+	            ///sysHome/blogger?name=${item.name}&id=${item._id.toString()}
+	            users.forEach((item, index) => {
+	            	let id = item._id.toString();
+	            	str +=`<li><a href="/${id}/postsList">${item.name}</a></li>`;
+	            });
+	            $("#blogger_ul").html(str);
+	        },
+	        error: (err) => {
+	            console.log(err);
+	        }
+	    });
+	     //获取侧边栏 最新评论 信息
+	     $.ajax({
+	        url: "/getAsideComment",
+	        type: "get",
+	        data: {},
+	        success: (result) => {
+	            let str = "";
+	            result.forEach((item, index) => { 
+	            	str +=`<li><a href="/sysHome/comment?postId=${item.belong.toString()}">${item.content}</a></li>`;
+	            });
+	            $("#comment_ul").html(str);
+	             
+	        },
+	        error: (err) => {
+	            console.log(err);
+	        }
+	    });
+	}
+	
+	//登录注册
+	function toLogin(){
+		window.location.href="/login";
+	}
+	
+	//首页
+	function recommends(){
+		window.location.reload();
+	}
+	//精华
+	function specials(){
+		
+	}
+	//我赞
+	function supports(){
+		if(username  === ""){  //没有登录
+			window.location.href = "/login";
+		}else{  //登录了
+			
+			
+		}
+	}
+	//我评
+	function comments(){
+		if(username === ""){  //没有登录
+			window.location.href = "/login";
+		}else{  //登录了
+			
+			
+		}
+	}
+	
+</script>
+
+{% endblock %}

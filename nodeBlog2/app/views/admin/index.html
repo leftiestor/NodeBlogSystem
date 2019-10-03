@@ -1,0 +1,92 @@
+{% extends '../layout.html' %}
+
+{% block content %}
+
+{% include "nav-top.html" %}
+
+<div class="container-fluid">
+    <div class="row">
+        <!--目录-->
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <!--<span class="sr-only">(current)</span>-->
+                <ul class="nav flex-column" id="myUl" data-index="{{navIndex}}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/admin">
+                        <i class="fa fa-list-ul" aria-hidden="true"></i>文章管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/newPost">
+                        <i class="fa fa-plus" aria-hidden="true"></i>发布新文</a>
+                    </li>
+                    
+                     <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/categoryManage">
+                        <i class="fa fa-puzzle-piece"></i>分类管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/commentManage">
+                        <i class="fa fa-quote-left"></i>评论管理</a>
+                    </li>
+                     
+                    <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/templatePost">
+                        <i class="fa fa-sticky-note"></i>草稿箱</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/recyclePost">
+                        <i class="fa fa-recycle"></i> 回收站</a>    
+                    </li>
+
+ 					<li class="nav-item">
+                        <a class="nav-link" href="/{{userId}}/userCenter">
+                        <i class="fa fa-user"></i>个人中心</a>    
+                    </li>
+                </ul>
+
+            </div>
+        </nav>
+
+        <!-- 主体内容 -->
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <!-- 帖子列表0 新建帖子1 分类2 评论3  草稿箱4 回收站5 个人中心6  编辑帖子7-->
+            {% if navIndex==0 %}
+            {% include "post/postTable.html" ignore missing %}
+            {% elseif navIndex==1 || navIndex==7  %}
+            {% include "post/newPost.html" ignore missing %}
+            
+           	{% elseif navIndex==2 %}
+            {% include "post/categoryManage.html" ignore missing %}
+            {% elseif navIndex==3 %}
+            {% include "post/commentManage.html" ignore missing %}
+            
+            {% elseif navIndex==4 %}
+            {% include "post/templatePost.html" ignore missing %}
+            {% elseif navIndex==5 %}
+            {% include "post/recyclePost.html" ignore missing %}
+            {% elseif navIndex==6 %}
+            {% include "post/userCenter.html" ignore missing %}
+            {% endif %}
+        </main>
+    </div>
+</div>
+<script>
+$(function() {
+	let ind = parseInt($("#myUl").attr("data-index"));
+	if(ind == 7) {
+		let str = `<i class="fa fa-pencil"></i>编辑文章`;
+		$("#myUl li").eq(1).children("a").eq(0).html(str).addClass("active");
+	} else {
+		$("#myUl li").eq(ind).children("a").eq(0).addClass("active");
+	}
+
+	$("#myUl").on('click', 'li a', function() {
+		console.log($(this).index());
+		$(this).addClass("active");
+		$(this).parents("li").siblings().children("a").removeClass("active")
+
+	})
+});
+</script>
+{% endblock %}
